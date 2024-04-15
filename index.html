@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lemonade Tycoon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        #game-container {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <scene id="start">
+            <text content="Welcome to Lemonade Tycoon!" style="font-size: 24px;"></text>
+            <text content="Click the button to start your lemonade stand business." style="margin-top: 20px;"></text>
+            <button onclick="startGame()">Start</button>
+        </scene>
+
+        <scene id="gameplay" onload="setupGame()">
+            <text id="moneyText" style="font-size: 20px; margin-bottom: 10px;"></text>
+            <text id="priceText" style="font-size: 20px; margin-bottom: 10px;"></text>
+            <button onclick="buyIngredient()">Buy Ingredients</button>
+            <button onclick="setPrice()">Set Price</button>
+            <button onclick="sellLemonade()">Sell Lemonade</button>
+            <button onclick="endDay()">End Day</button>
+        </scene>
+
+        <script>
+            var money = 10;
+            var price = 1;
+            var lemonadeStock = 0;
+
+            function startGame() {
+                GameTekEngine.loadScene("gameplay");
+            }
+
+            function setupGame() {
+                updateUI();
+            }
+
+            function updateUI() {
+                document.getElementById("moneyText").textContent = "Money: $" + money.toFixed(2);
+                document.getElementById("priceText").textContent = "Price per cup: $" + price.toFixed(2);
+            }
+
+            function buyIngredient() {
+                if (money >= 1) {
+                    money -= 1;
+                    lemonadeStock += 10;
+                    updateUI();
+                } else {
+                    GameTekEngine.showMessage("Not enough money!");
+                }
+            }
+
+            function setPrice() {
+                var newPrice = parseFloat(prompt("Enter new price per cup:"));
+                if (!isNaN(newPrice) && newPrice > 0) {
+                    price = newPrice;
+                    updateUI();
+                } else {
+                    GameTekEngine.showMessage("Invalid price!");
+                }
+            }
+
+            function sellLemonade() {
+                if (lemonadeStock > 0) {
+                    money += price;
+                    lemonadeStock -= 1;
+                    updateUI();
+                } else {
+                    GameTekEngine.showMessage("Out of lemonade!");
+                }
+            }
+
+            function endDay() {
+                GameTekEngine.loadScene("start");
+            }
+        </script>
+    </div>
+
+    <script>
+        // GameTek Engine implementation (simplified)
+        var GameTekEngine = {
+            loadScene: function(sceneId) {
+                var scene = document.getElementById(sceneId);
+                if (scene) {
+                    document.getElementById("game-container").innerHTML = scene.innerHTML;
+                    // Execute script tags in the loaded scene
+                    var scripts = scene.getElementsByTagName("script");
+                    for (var i = 0; i < scripts.length; i++) {
+                        eval(scripts[i].innerHTML);
+                    }
+                }
+            },
+            showMessage: function(message) {
+                alert(message);
+            }
+        };
+
+        // Load the initial scene
+        GameTekEngine.loadScene("start");
+    </script>
+</body>
+</html>
+
